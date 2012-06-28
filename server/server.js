@@ -15,11 +15,10 @@ var profiler_port = 8080;
 
 var profiler_request = function(upstream_response, req_path, transform) {
     var profiler_host = "localhost";
-
     var client = http.createClient(profiler_port, profiler_host);
     var read_data = "";
-
     var request = client.request("GET", req_path, {'host' : profiler_host});
+
     request.on('response', function(response) {
             response.setEncoding('utf8');
             upstream_response.writeHead(response.statusCode);
@@ -33,6 +32,10 @@ var profiler_request = function(upstream_response, req_path, transform) {
                 upstream_response.write(read_data, 'binary');
                 upstream_response.end();
             });
+    });
+
+    client.on('error', function(err) {
+        error500(upstream_response, err);
     });
     request.end();
 };
@@ -70,6 +73,7 @@ var ok200 = function(response, data) {
 var profilerOp = function(response, uri) {
     if (uri === '/profiler/running') {
         profiler_request(response, uri);
+        //ok200(response, '{"running": true}');
     }
     else if (uri === '/profiler/start') {
 
@@ -77,7 +81,7 @@ var profilerOp = function(response, uri) {
     else if (uri === '/profiler/stop') {
         profiler_request(response, uri, function(data) {
             if (data && data !== "") {
-				console.log(data);
+                console.log(data);
                 var profile = preprocess_profile(JSON.parse(data));
                 return JSON.stringify(profile);
             }
@@ -165,7 +169,7 @@ var preprocess_profile = function(profile) {
 
 
 
-http.createServer(function(request, response) {
+var server = http.createServer(function(request, response) {
     var uri = decodeURI(url.parse(request.url).pathname);
 
     console.log("[info] processing request for " + uri + "...");
@@ -181,7 +185,25 @@ http.createServer(function(request, response) {
     
     getFile(response, path.join(uri, ''));
 
-}).listen(port);
+});
+
+var io = require('socket.io').listen(server);
+
+
+io.sockets.on('connection', function (socket) {
+    console.log('new socket connection');
+    
+    socket.on('profiler:didStart', function(data) {
+        console.log('received profiler:didStart');
+        socket.broadcast.emit('profiler:didStart', data);
+    });
+
+    socket.on('profiler:didStop', function(data) {
+        socket.broadcast.emit('profiler:didStop', data);
+    });
+});
+
+server.listen(port);
 
 console.log("[info] server running at http://localhost:" + port + '/');
 console.log("[info] serving files from " + server_dir);

@@ -1,9 +1,12 @@
 var tiprofiler = tiprofiler || {};
 (function() {
 
-    tiprofiler.createAppLayout = function(profilerDataStore) {
-        var toolbar = tiprofiler.createToolbar();
-        var treeGrid = tiprofiler.createTreeGrid(profilerDataStore);
+    var AppLayout = function() {
+
+    };
+
+    AppLayout.prototype.createView = function() {
+        var self = this;
         var appLayout = Ext.create('Ext.Viewport',{
             layout : "border",
             items : [
@@ -16,7 +19,7 @@ var tiprofiler = tiprofiler || {};
                         }
                     },
                     items: [
-                        toolbar
+                        self.toolbarView
                     ]
                 },
                 {
@@ -36,7 +39,7 @@ var tiprofiler = tiprofiler || {};
                         height: '100%',
                         xtype: 'panel',
                         items:[
-                            treeGrid
+                            self.treeGridView
                         ]
                     },
                     {
@@ -50,10 +53,12 @@ var tiprofiler = tiprofiler || {};
                     }]
                 }]
         });
-        appLayout.editor = tiprofiler.createEditor();
-        appLayout.toolbar = toolbar;
-        appLayout.treeGrid = treeGrid;
 
         return appLayout;
+    };
+
+
+    tiprofiler.createAppLayout = function() {
+        return new AppLayout();
     };
 }());
