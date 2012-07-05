@@ -18,48 +18,80 @@ var tiprofiler = tiprofiler || {};
 
     Ext.onReady(function(){
         var profilerDataStore = tiprofiler.createProfilerDataStore();
-        var profilerStore = tiprofiler.createProfilerStore();
-
         var appLayout = tiprofiler.createAppLayout();
 
         appLayout.toolbarView = tiprofiler.createToolbar();
-        appLayout.treeGridView = tiprofiler.createTreeGrid(profilerDataStore);
+        appLayout.treeGridView = tiprofiler.createTreeGrid(profilerDataStore.store);
 
         appLayout.createView();
 
         var editor = tiprofiler.createEditor();
         editor.updateFileInfo();
 
+
+        var socket = io.connect('http://localhost');
+
+        var timeout = null;
+
+        var clearTimer = function() {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+        };
+
+        var setTimer = function(cb) {
+            clearTimer();
+            timeout = setTimeout(function() {
+                timeout = null;
+                cb.call();
+            }, 4000);
+        };
+
+
         tiprofiler.app.on('profiler:shouldStart', function() {
             tiprofiler.createToast('Ti Profiler', 'Starting...');
+            socket.emit('TiProfiler:start');
+            setTimer(function() {
+                appLayout.toolbarView.startStopButton.setNormal();
+                tiprofiler.createToast('Ti Profiler', 'the profiler didn\'t respond...');
+            });
         });
 
         tiprofiler.app.on('profiler:shouldStop', function() {
             tiprofiler.createToast('Ti Profiler', 'Stopping...');
+            socket.emit('TiProfiler:stop');
+            setTimer(function() {
+                appLayout.toolbarView.startStopButton.setPressed();
+                tiprofiler.createToast('Ti Profiler', 'the profiler didn\'t respond...');
+            });
         });
 
-        tiprofiler.app.on('profiler:running', function(e) {
-            if (!e.success || !e.records || e.records.length === 0) {
-                tiprofiler.createToast('Error!', 'Something went wrong: is the app running?', true);
-                return;
-            }
-            var info = e.records[0].data;
-            var running = info.running;
+        socket.on('connect', function() {
+            console.log('socket.io connected...');
+            socket.emit('TiProfiler:isRunning');
+        });
 
-            var text = running ? 'is running...' : 'is not running';
-            tiprofiler.createToast('Ti Profiler', text);
+        socket.on('profiler:didStart', function (data) {
+            console.log('profiler:didStart - ' + data);
+            clearTimer();
+            tiprofiler.createToast('Ti Profiler', 'running');
+            appLayout.toolbarView.startStopButton.setPressed();
+        });
+
+        socket.on('profiler:didStop', function (data) {
+            console.log('profiler:didStop - ' + JSON.stringify(data));
+            clearTimer();
+            if (data.profileInfo) {
+                profilerDataStore.load(JSON.parse(data.profileInfo));
+            }
+            tiprofiler.createToast('Ti Profiler', 'stopped');
+            appLayout.toolbarView.startStopButton.setNormal();
         });
 
         tiprofiler.app.on('treegrid:rowselected', function(e){
             editor.updateFileInfo(e);
         });
 
-        profilerStore.load();
-
-        var socket = io.connect('http://localhost');
-        socket.on('profiler:didStart', function (data) {
-            console.log('profiler:didStart - ' + data);
-        });
     });
 
 

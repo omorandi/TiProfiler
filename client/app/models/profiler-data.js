@@ -5,9 +5,6 @@ var tiprofiler = tiprofiler || {};
     var ProfilerDataStore = function () {
         var self = this;
 
-        //this is a hack just for effectively disabling autoLoad the first time
-        self.loadEnabled = false;
-
         Ext.define('ProfileData', {
             extend: 'Ext.data.Model',
             fields: [
@@ -29,24 +26,32 @@ var tiprofiler = tiprofiler || {};
                 'load': function(store, records, successful) {
                   console.log('loaded data:');
                   console.log(records);
-                },
-                beforeload: function(store, op){
-                    if (!self.loadEnabled) { return false; }
                 }
             },
+            /*
             proxy: {
                 type: 'ajax',
                 //the store will get the content from the .json file
-                url: '../profiler/stop'
+                url: '../profiler/profiledata'
             },
-            autoLoad: false,
+            */
+            proxy: {
+                type: 'memory',
+                reader: {
+                    type: 'json'
+                }
+            },
+            autoLoad: true,
             folderSort: false
         });
     };
 
-    ProfilerDataStore.prototype.load = function() {
-        this.loadEnabled = true;
-        this.store.load();
+    ProfilerDataStore.prototype.load = function(data) {
+        if (data) {
+            this.store.setRootNode(data);
+            //this.store.data = data;
+        }
+        //this.store.load();
     };
 
 
