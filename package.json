@@ -1,0 +1,21 @@
+{
+  "name": "tiprofiler",
+  "version": "0.0.1",
+  "dependencies": {
+    "socket.io": ">= 0.9.6"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": ">=0.6.10"
+  },
+  "author": "Olivier Morandi <olivier.morandi@gmail.com> (http://titaniumninja.com)",
+  "description": "Profiler support for Titanium Mobile (iOS)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/omorandi/TiProfiler.git"
+  },
+  "bin" : { 
+    "tiprofiler" : "./bin/tiprofiler"
+  }
+}
