@@ -7,10 +7,7 @@ The whole system is based on the following components:
 2. A node.js server component (tiprofiler)
 3. A client web application providing a UI for interacting with the profiler and extracting profiling data
 
-The following video showcases the basic interaction between such three components:
-
-<iframe src="http://player.vimeo.com/video/46148981" width="500" height="313" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/46148981">TiProfiler demo</a> from <a href="http://vimeo.com/user8368459">Olivier Morandi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
-
+[This video](http://vimeo.com/46148981) showcases the basic interaction between such three components.
 
 ## Installation
 ### Custom Ti SDK Installation (2.1.0.GA-profiler)
