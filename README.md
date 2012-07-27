@@ -10,14 +10,19 @@ The whole system is based on the following components:
 [This video](http://vimeo.com/46148981) showcases the basic interaction between such three components.
 
 ## Installation
-### Custom Ti SDK Installation (2.1.0.GA-profiler)
 
-Download [this package](https://s3.amazonaws.com/titaniumninja/tiprofiler/2.1.0.GA-profiler.zip) and install it in you Titanium SDK `mobilesdk` directory. Such directory should be one of the following:
+### Custom Ti SDK 
+
+The following two steps are mutually exclusive
+
+#### Full SDK package (2.1.0.GA-profiler)
+
+Download [this package](https://s3.amazonaws.com/titaniumninja/tiprofi	ler/2.1.0.GA-profiler.zip) and install it in you Titanium SDK `mobilesdk` directory. Such directory should be one of the following:
 
 	* /Library/Application\ Support/Titanium/mobilesdk/osx/
 	* ${HOME}/Library/Application\ Support/Titanium/mobilesdk/osx/
 
-There you should find your standard Titanium SDK installs (e.g. 2.0.1.GA2, 2.1.0.GA, etc.). Extract the content of the above package there, so that the contents of the SDK directory would look like (depending on the actual versions of the sdk installed in your system):
+There, you should find your standard Titanium SDK installs (e.g. 2.0.1.GA2, 2.1.0.GA, etc.). Extract the content of the above package there, so that the contents of the SDK directory would look like (depending on the actual versions of the sdk installed in your system):
 
 	$ ls /Library/Application\ Support/Titanium/mobilesdk/osx/
 	
@@ -29,6 +34,9 @@ There you should find your standard Titanium SDK installs (e.g. 2.0.1.GA2, 2.1.0
 The custom SDK package is essentially identical to the official 2.1.0.GA one, except that it contains a modified version of the TiJSCore library (`libTicore.a`), and the default Xcode application project has been modified in order to link the Security framework from iOS. For some hints on the modifications required by the TiJSCore library in order to enable the profiling of Titanium JavaScript applications you can check out [this post](http://titaniumninja.com/profiling-ti-mobile-apps-is-it-possible/).
 
 At the moment, the custom `libTicore.a` library is distributed exclusively in binary form and the contained modifications are not released as open source, but they may well be in the future.
+
+#### Installing the libTiCore.a binary alone, without the prebuilt package
+Anybody wanting to follow all the steps, without using the prebuilt package, can download a [custom build of the libTiCore.a library](https://s3.amazonaws.com/titaniumninja/tiprofiler/libTiCore.a.zip), copy it in the `${TI_SDK}/iphone` directory of a 2.X.X version of the Ti SDK (where `${TI_SDK}` for example is `/Library/Application\ Support/Titanium/mobilesdk/osx/2.1.0.GA`, open the `${TI_SDK}/iphone/iphone/Titanium.xcodeproj`) and add there a reference to the Security framework.
 
 ### Server component installation
 You need to have [node.js](http://nodejs.org/) installed in your system and once you have cloned this repository you need to update its dependencies:
